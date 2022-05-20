@@ -1,9 +1,5 @@
 #!/usr/bin/python3
 
-import datetime
-
-
-
 def main():
     signs = [{'name': 'Aquarius', 'classic': '01-20', 'new': '02-16'},
             {'name': 'Pisces', 'classic': '02-19', 'new': '03-11'},
@@ -26,7 +22,7 @@ def main():
     again = True
 
     while again:
-        # Set continue to false because python is silly and doesnt have do-until loops
+        # Set continue to false because python is dumb and doesnt have do-until loops
         again = False
 
         month = input("\nEnter your month [01-12]: ")
@@ -54,15 +50,3 @@ def main():
             again = True
 
 main()
-
-
-
-
-
-
-
-
-
-
-
-
