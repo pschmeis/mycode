@@ -6,7 +6,10 @@ import os
 def showInstructions():
     #print a main menu and the commands
     print('''
-RPG Game
+You find yourself in a poorly lit house.
+A sense of forboding fills the stagnant air.
+The foyer door is locked behind you.
+Find a way out before something... finds you.
 ========
 Commands:
   go [direction]
@@ -35,6 +38,7 @@ def showStatus():
     #print the player's current status
     print('---------------------------')
     print('You are in the ' + currentRoom)
+    #print(currentRoom['description'])
     #print the current inventory
     print('Inventory : ' + str(inventory))
     #print an item if there is one
@@ -167,27 +171,44 @@ while True:
     
     ## Item usage -- WIN CONDITIONS      
     if move[0] == 'use':
-        if move[1] == 'hammer' and 'hammer' in inventory:
-            if currentRoom == 'Library':
-                print('You smash the window and excape!')
-                break
-            else:
-                print("You don't see a way to use this here.")
-        if move[1] == 'key' and 'key' in inventory:
-            if currentRoom == 'Stairway':
-                rooms['Master Bedroom']['lock'] = False
-                inventory.remove('key')
-                print("You unlock the master bedroom.")
-            elif currentRoom == 'Foyer':
-                print("The key does not fit this lock")
-
-    ## Define how a player can win
-    if currentRoom == 'Foyer' and 'foyer key' in inventory:
-        print('You escaped the house safely... YOU WIN!')
-        break
+        if move[1] in inventory:
+            if move[1] == 'hammer':
+                if currentRoom == 'Library':
+                    print('You smash the window and excape!')
+                    break
+                else:
+                    print("You don't see a way to use this here.")
+            if move[1] == 'foyer key':
+                if currentRoom == 'Foyer':
+                    print('You escaped the house safely... YOU WIN!')
+                    break
+            if move[1] == 'key':
+                if currentRoom == 'Stairway':
+                    rooms['Master Bedroom']['lock'] = False
+                    inventory.remove('key')
+                    print("You unlock the master bedroom.")
+                elif currentRoom == 'Foyer':
+                    print("The key does not fit this lock")
+        else:
+            print(f"You do not have a {move[1]}.")
 
     ## If a player enters a room with a monster
-    elif 'item' in rooms[currentRoom] and 'monster' in rooms[currentRoom]['item']:
-        print('A monster has got you... GAME OVER!')
-        break
-    
+    if 'monster' in rooms[currentRoom]:
+        if rooms[currentRoom]['monster'] == 'idle':
+            print('\u001b[31mThe room is unnaturally cold and you see a shadowy figure in the corner.\u001b[0m')
+            rooms[currentRoom]['monster'] = 'awake'
+        elif  rooms[currentRoom]['monster'] == 'awake':
+            if 'knife' not in inventory and 'potion' not in inventory:
+                print('\u001b[31mThe cold shadow reacts to your presence and quickly engulfs you.')
+                print('Your vision goes black.')
+                break
+            elif 'knife' in inventory:
+                print('\u001b[31mThe cold shadow reacts to your presence and moves toward you.')
+                print('As it reaches you, you strike out with your knife.')
+                print('After exchanging several blows you succumb to your wounds.')
+            elif 'potion' in inventory:
+                print('\u001b[31mThe cold shadow reacts to your presence and moves toward you.')
+                print('Upon reaching you, it strikes out several times.')
+                print('Your potion is insufficient and you succumb to your wounds.')
+            else:
+                print('\u001b
