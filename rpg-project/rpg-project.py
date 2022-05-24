@@ -38,7 +38,8 @@ def showStatus():
     #print the player's current status
     print('---------------------------')
     print('You are in the ' + currentRoom)
-    #print(currentRoom['description'])
+    if 'description' in rooms[currentRoom]:
+        print(rooms[currentRoom]['description'])
     #print the current inventory
     print('Inventory : ' + str(inventory))
     #print an item if there is one
@@ -60,40 +61,47 @@ rooms = {
                   'north' : 'Kitchen',
                   'east'  : 'Sunroom',
                   'west'  : 'Lounge',
+                  'description' : 'A dimly lit, drafty entrance to the residence.\nYou see stairs, doors on either side and what looks to be a kitchen just past the stairs.',
                 },
             'Kitchen' : {
                   'east' : 'Dining Room',
                   'south' : 'Foyer',
                   'item'  : 'potion',
+                  'description' : 'A sizable kitchen. You see an exit to the dining room and back to the foyer.',
                 },
             'Dining Room' : {
                   'west' : 'Kitchen',
                   'south': 'Sunroom',
                   'item' : 'knife',
+                  'description' : 'An impressive dining room with access to the kitchen and an easy transition to a sunroom.',
                },
             'Sunroom' : {
                   'north' : 'Dining Room',
                   'west'  : 'Foyer',
+                  'description' : 'An odd sunroom. You see blackout drapes and what appears to be bars over the windows.',
                },
             'Lounge' : {
                   'north' : 'Office',
                   'east' : 'Foyer',
                   'item' : 'book',
+                  'description' : 'If not for the... untoward smell wafting from the fireplace; this lounge would be quite cozy.',
                },
             'Office' : {
                   'south' : 'Lounge',
                   'item'  : 'whiskey',
+                  'description' : 'So far, the only normal room in the house... which makes it odd?',
                },
             'Stairway' : {
                   'down' : 'Foyer',
                   'north' : 'Master Bedroom',
                   'west' : 'Library',
-                  'east' : 'Hallway',			  
+                  'east' : 'Hallway',
+                  'description' : 'A sizable staircase with access to the second floor. A large door is on the north side.',
                },
             'Library' : {
-                  'west' : 'Balcony',
                   'east' : 'Stairway',
-                  'item' : 'key',				  
+                  'item' : 'key',
+                  'description' : 'Large, but sturdy windows look to the outside. Perhaps there is some way to open them?',
                },
             'Master Bedroom' : {
                   'south' : 'Stairway',
@@ -106,13 +114,16 @@ rooms = {
                   'north' : 'Craftroom',
                   'south' : 'Bedroom',
                   'west' : 'Stairway',
+                  'description' : 'A dark hallway with what looks like bedroom doors on either end.',
                },
             'Craftroom' : {
                   'south' : 'Hallway',		  
                   'item' : 'hammer',
+                  'description' : 'Not a bedroom, but some sort of hobby room. But with a distinct lack of any projects underway.',
                },
             'Bedroom' : {
-                  'north' : 'Hallway',		  
+                  'north' : 'Hallway',
+                  'description' : 'A sparsely furnished bedroom that would benefit from any color remotely brighter than \'dark grey.\'',
                },
          }
        
@@ -178,17 +189,24 @@ while True:
                     break
                 else:
                     print("You don't see a way to use this here.")
-            if move[1] == 'foyer key':
+            elif move[1] == 'foyer key':
                 if currentRoom == 'Foyer':
                     print('You escaped the house safely... YOU WIN!')
                     break
-            if move[1] == 'key':
+            elif move[1] == 'key':
                 if currentRoom == 'Stairway':
                     rooms['Master Bedroom']['lock'] = False
                     inventory.remove('key')
                     print("You unlock the master bedroom.")
                 elif currentRoom == 'Foyer':
                     print("The key does not fit this lock")
+            elif move[1] == 'whiskey': 
+                if 'monster' in rooms[currentRoom]:
+                    rooms[currentRoom]['monster'] = 'pacified'
+                    print("The shade accepts your offer.")
+                    print("Instead of attacking you, the bottle becomes the victim.")
+                else:
+                    print("You do not see a use for this here.")
         else:
             print(f"You do not have a {move[1]}.")
 
@@ -206,9 +224,13 @@ while True:
                 print('\u001b[31mThe cold shadow reacts to your presence and moves toward you.')
                 print('As it reaches you, you strike out with your knife.')
                 print('After exchanging several blows you succumb to your wounds.')
+                break
             elif 'potion' in inventory:
                 print('\u001b[31mThe cold shadow reacts to your presence and moves toward you.')
                 print('Upon reaching you, it strikes out several times.')
                 print('Your potion is insufficient and you succumb to your wounds.')
+                break
             else:
-                print('\u001b
+                rooms[currentRoom]['monster'] = 'dead'
+                print('\u001b[31mThe cold shadow reacts to your presence and moves toward you.')
+                print('After exchaning blows and utilizing your potion, the shade dissipates.')
