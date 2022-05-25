@@ -49,4 +49,5 @@ def main():
         if response.lower() == 'y':
             again = True
 
-main()
+if __name__ == '__main__':
+    main()

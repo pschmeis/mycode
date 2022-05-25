@@ -131,106 +131,110 @@ rooms = {
 #start the player in the Hall
 currentRoom = 'Foyer'
 
-showInstructions()
+def main():
+    showInstructions()
 
-#loop forever
-while True:
-    showStatus()
+    #loop forever
+    while True:
+        showStatus()
 
-    #get the player's next 'move'
-    #.split() breaks it up into an list array
-    #eg typing 'go east' would give the list:
-    #['go','east']
-    move = ''
-    while move == '':
-       move = input('>')
+        #get the player's next 'move'
+        #.split() breaks it up into an list array
+        #eg typing 'go east' would give the list:
+        #['go','east']
+        move = ''
+        while move == '':
+           move = input('>')
 
-    # split allows an items to have a space on them
-    # get golden key is returned ["get", "golden key"]          
-    move = move.lower().split(" ", 1)
+        # split allows an items to have a space on them
+        # get golden key is returned ["get", "golden key"]          
+        move = move.lower().split(" ", 1)
 
-    os.system('clear')
+        os.system('clear')
 
-    #if they type 'go' first
-    if move[0] == 'go' or move[0] == 'move':
-        #check that they are allowed wherever they want to go
-        if move[1] in rooms[currentRoom]:
-            targetRoom = rooms[currentRoom][move[1]]
-            if 'lock' in rooms[targetRoom] and rooms[targetRoom]['lock'] == True:
-                print("That room is locked!")
+        #if they type 'go' first
+        if move[0] == 'go' or move[0] == 'move':
+            #check that they are allowed wherever they want to go
+            if move[1] in rooms[currentRoom]:
+                targetRoom = rooms[currentRoom][move[1]]
+                if 'lock' in rooms[targetRoom] and rooms[targetRoom]['lock'] == True:
+                    print("That room is locked!")
+                else:
+                    #set the current room to the new room
+                    currentRoom = rooms[currentRoom][move[1]]
+            #there is no door (link) to the new room
             else:
-                #set the current room to the new room
-                currentRoom = rooms[currentRoom][move[1]]
-        #there is no door (link) to the new room
-        else:
-            print('You can\'t go that way!')
+                print('You can\'t go that way!')
 
-    #if they type 'get' first
-    if move[0] == 'get' or move[0] == 'take' :
-        #if the room contains an item, and the item is the one they want to get
-        if "item" in rooms[currentRoom] and move[1] in rooms[currentRoom]['item']:
-            #add the item to their inventory
-            inventory += [move[1]]
-            #display a helpful message
-            print(move[1] + ' got!')
-            #delete the item from the room
-            del rooms[currentRoom]['item']
-        #otherwise, if the item isn't there to get
-        else:
-            #tell them they can't get it
-            print('Can\'t get ' + move[1] + '!')
-    
-    ## Item usage -- WIN CONDITIONS      
-    if move[0] == 'use':
-        if move[1] in inventory:
-            if move[1] == 'hammer':
-                if currentRoom == 'Library':
-                    print('You smash the window and excape!')
+        #if they type 'get' first
+        if move[0] == 'get' or move[0] == 'take' :
+            #if the room contains an item, and the item is the one they want to get
+            if "item" in rooms[currentRoom] and move[1] in rooms[currentRoom]['item']:
+                #add the item to their inventory
+                inventory += [move[1]]
+                #display a helpful message
+                print(move[1] + ' got!')
+                #delete the item from the room
+                del rooms[currentRoom]['item']
+            #otherwise, if the item isn't there to get
+            else:
+                #tell them they can't get it
+                print('Can\'t get ' + move[1] + '!')
+        
+        ## Item usage -- WIN CONDITIONS      
+        if move[0] == 'use':
+            if move[1] in inventory:
+                if move[1] == 'hammer':
+                    if currentRoom == 'Library':
+                        print('You smash the window and excape!')
+                        break
+                    else:
+                        print("You don't see a way to use this here.")
+                elif move[1] == 'foyer key':
+                    if currentRoom == 'Foyer':
+                        print('You escaped the house safely... YOU WIN!')
+                        break
+                elif move[1] == 'key':
+                    if currentRoom == 'Stairway':
+                        rooms['Master Bedroom']['lock'] = False
+                        inventory.remove('key')
+                        print("You unlock the master bedroom.")
+                    elif currentRoom == 'Foyer':
+                        print("The key does not fit this lock")
+                elif move[1] == 'whiskey': 
+                    if 'monster' in rooms[currentRoom]:
+                        rooms[currentRoom]['monster'] = 'pacified'
+                        print("The shade accepts your offer.")
+                        print("Instead of attacking you, the bottle becomes the victim.")
+                    else:
+                        print("You do not see a use for this here.")
+            else:
+                print(f"You do not have a {move[1]}.")
+
+        ## If a player enters a room with a monster
+        if 'monster' in rooms[currentRoom]:
+            if rooms[currentRoom]['monster'] == 'idle':
+                print('\u001b[31mThe room is unnaturally cold and you see a shadowy figure in the corner.\u001b[0m')
+                rooms[currentRoom]['monster'] = 'awake'
+            elif  rooms[currentRoom]['monster'] == 'awake':
+                if 'knife' not in inventory and 'potion' not in inventory:
+                    print('\u001b[31mThe cold shadow reacts to your presence and quickly engulfs you.')
+                    print('Your vision goes black.')
+                    break
+                elif 'knife' in inventory:
+                    print('\u001b[31mThe cold shadow reacts to your presence and moves toward you.')
+                    print('As it reaches you, you strike out with your knife.')
+                    print('After exchanging several blows you succumb to your wounds.')
+                    break
+                elif 'potion' in inventory:
+                    print('\u001b[31mThe cold shadow reacts to your presence and moves toward you.')
+                    print('Upon reaching you, it strikes out several times.')
+                    print('Your potion is insufficient and you succumb to your wounds.')
                     break
                 else:
-                    print("You don't see a way to use this here.")
-            elif move[1] == 'foyer key':
-                if currentRoom == 'Foyer':
-                    print('You escaped the house safely... YOU WIN!')
-                    break
-            elif move[1] == 'key':
-                if currentRoom == 'Stairway':
-                    rooms['Master Bedroom']['lock'] = False
-                    inventory.remove('key')
-                    print("You unlock the master bedroom.")
-                elif currentRoom == 'Foyer':
-                    print("The key does not fit this lock")
-            elif move[1] == 'whiskey': 
-                if 'monster' in rooms[currentRoom]:
-                    rooms[currentRoom]['monster'] = 'pacified'
-                    print("The shade accepts your offer.")
-                    print("Instead of attacking you, the bottle becomes the victim.")
-                else:
-                    print("You do not see a use for this here.")
-        else:
-            print(f"You do not have a {move[1]}.")
+                    rooms[currentRoom]['monster'] = 'dead'
+                    print('\u001b[31mThe cold shadow reacts to your presence and moves toward you.')
+                    print('After exchaning blows and utilizing your potion, the shade dissipates.')
 
-    ## If a player enters a room with a monster
-    if 'monster' in rooms[currentRoom]:
-        if rooms[currentRoom]['monster'] == 'idle':
-            print('\u001b[31mThe room is unnaturally cold and you see a shadowy figure in the corner.\u001b[0m')
-            rooms[currentRoom]['monster'] = 'awake'
-        elif  rooms[currentRoom]['monster'] == 'awake':
-            if 'knife' not in inventory and 'potion' not in inventory:
-                print('\u001b[31mThe cold shadow reacts to your presence and quickly engulfs you.')
-                print('Your vision goes black.')
-                break
-            elif 'knife' in inventory:
-                print('\u001b[31mThe cold shadow reacts to your presence and moves toward you.')
-                print('As it reaches you, you strike out with your knife.')
-                print('After exchanging several blows you succumb to your wounds.')
-                break
-            elif 'potion' in inventory:
-                print('\u001b[31mThe cold shadow reacts to your presence and moves toward you.')
-                print('Upon reaching you, it strikes out several times.')
-                print('Your potion is insufficient and you succumb to your wounds.')
-                break
-            else:
-                rooms[currentRoom]['monster'] = 'dead'
-                print('\u001b[31mThe cold shadow reacts to your presence and moves toward you.')
-                print('After exchaning blows and utilizing your potion, the shade dissipates.')
+if __name__ == '__main__':
+    main()
