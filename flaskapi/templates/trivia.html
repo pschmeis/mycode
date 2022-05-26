@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Trivia</title>
+</head>
+<body>
+    <form action = "/" method = "POST">
+        <p>What is the airspeed velocity of an unladen swallow?</p>
+        <p><input type = "text" name = "nm"></p>
+        <p><input type = "submit" value = "submit"></p>
+    </form>
+    {% if ans=="african or european" %}
+    <h3>Correct!</h3>
+    {% elif ans==null %}
+    {% else %}
+    <h3>Incorrect, try again.</h3>
+    {% endif %}
+</body>
+</html>
+
